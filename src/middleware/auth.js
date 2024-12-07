@@ -4,7 +4,7 @@ const { User, Role } = require('../models');
 exports.authenticate = async (req, res, next) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
-    
+
     if (!token) {
       return res.status(401).json({ message: 'Authentication required' });
     }
@@ -12,7 +12,7 @@ exports.authenticate = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findOne({
       where: { id: decoded.id },
-      include: Role
+      include: Role,
     });
 
     if (!user || !user.isActive) {
@@ -29,9 +29,9 @@ exports.authenticate = async (req, res, next) => {
 exports.authorize = (requiredPermissions) => {
   return (req, res, next) => {
     const userPermissions = req.user.Role.permissions;
-    
-    const hasPermission = requiredPermissions.every(
-      permission => userPermissions.includes(permission)
+
+    const hasPermission = requiredPermissions.every((permission) =>
+      userPermissions.includes(permission)
     );
 
     if (!hasPermission) {
